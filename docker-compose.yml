@@ -1,0 +1,40 @@
+version: '3'
+services:
+  web:
+    build: site
+    ports:
+      - "80:80"
+    volumes:
+      - ./www:/var/www/html/
+      - ./server/000-default.conf:/etc/apache2/sites-available/000-default.conf
+      - ./server/apache2.conf:/etc/apache2/apache2.conf
+      - ./server/php.ini:/usr/local/etc/php/php.ini
+    depends_on:
+      - postgres
+    networks:
+      - mynetwork
+
+  postgres:
+    image: postgres
+    environment:
+      POSTGRES_DB: database
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    networks:
+      - mynetwork
+
+  phppgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "8080:80"
+    depends_on:
+      - postgres
+    networks:
+      - mynetwork
+
+networks:
+  mynetwork:
+    driver: bridge
